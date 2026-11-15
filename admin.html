@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Administration – La Maison Des Pros</title>
+<link rel="icon" href="logo.png">
+<style>
+:root{--y:#ffc400;--y2:#e6ae00;--k:#101010;--w:#fff;--g:#f5f5f3;--line:#e3e3df;--txt:#555;--red:#c62828;--ok:#1b7a3a;--r:14px;--r2:10px;
+font-family:Inter,system-ui,Arial,sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--g);color:var(--txt);font:400 16px/1.55 Inter,system-ui,Arial,sans-serif}
+h1,h2{margin:0;color:var(--k);font-family:Montserrat,Arial,sans-serif;line-height:1.2}
+h1{font-size:24px;font-weight:800}
+h2{font-size:18px;font-weight:800;margin-bottom:14px}
+p{margin:0}
+.top{background:var(--k);color:var(--w);padding:14px 16px}
+.top .in{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.top img{width:40px;height:40px;border-radius:50%}
+.top b{font:800 16px Montserrat,Arial,sans-serif;flex:1}
+.top button{width:auto;min-height:40px;padding:0 16px;background:none;border:1.5px solid #555;color:var(--w);font-size:14px}
+.wrap{max-width:680px;margin:0 auto;padding:18px 16px 60px}
+.card{background:var(--w);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:16px}
+label,.lb{display:block;margin:12px 0 6px;font:600 14px Inter,Arial,sans-serif;color:var(--k)}
+input[type=text],input[type=email],input[type=password],input[type=number],input:not([type]),select,textarea{display:block;width:100%;padding:12px;border:1.5px solid var(--line);border-radius:var(--r2);background:var(--w);color:var(--k);font:400 16px/1.4 Inter,Arial,sans-serif}
+textarea{resize:none}
+input:focus,select:focus,textarea:focus{outline:3px solid var(--y);outline-offset:1px}
+.chk{display:flex;align-items:center;gap:12px;margin:16px 0 0;padding:12px 14px;border:1.5px solid var(--line);border-radius:var(--r2);cursor:pointer;color:var(--k)}
+.chk input{width:22px;height:22px;margin:0;flex:none;accent-color:#101010}
+button{width:100%;min-height:48px;padding:0 20px;border:0;border-radius:var(--r);background:var(--y);color:var(--k);font:700 15px Inter,Arial,sans-serif;cursor:pointer;transition:transform .15s ease,background .2s}
+button:hover{background:var(--y2)}
+button:active{transform:scale(.95)}
+button:disabled{opacity:.6}
+button.dk{background:var(--k);color:var(--w)}button.dk:hover{background:#2c2c2c}
+button.lt{background:var(--w);color:var(--k);border:1.5px solid var(--line)}
+button.sm{width:auto;min-height:38px;padding:0 14px;font-size:13px;border-radius:var(--r2)}
+button.dl{background:var(--w);color:var(--red);border:1.5px solid var(--line)}
+.row{display:flex;gap:10px;margin-top:14px}
+.hint{margin-top:6px;font-size:13px;color:var(--txt)}
+
+.tabs{display:flex;gap:8px;margin-bottom:16px}
+.tab{background:var(--w);color:var(--k);border:1.5px solid var(--line)}
+.tab.on{background:var(--k);color:var(--w);border-color:var(--k)}
+.nb{display:inline-block;min-width:22px;padding:0 6px;margin-left:6px;border-radius:999px;background:var(--y);color:var(--k);font:700 12px/22px Inter,Arial,sans-serif;text-align:center}
+
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.slot{position:relative;aspect-ratio:1/1;border:2px dashed var(--k);border-radius:var(--r);background:var(--w);overflow:hidden;display:grid;place-items:center;transition:transform .15s ease,background .2s}
+.slot:active{transform:scale(.96)}
+.slot.on{border-style:solid;border-color:var(--line)}
+.slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.slot .plus{display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--k);font:700 28px/1 Inter,Arial,sans-serif;pointer-events:none}
+.slot .plus small{font:600 12px Inter,Arial,sans-serif}
+.slot input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:0}
+.slot .x{position:absolute;top:5px;right:5px;z-index:3;width:30px;min-height:30px;height:30px;padding:0;border-radius:50%;background:var(--k);color:var(--w);font-size:18px;line-height:1}
+.slot .tag{position:absolute;left:5px;bottom:5px;z-index:2;background:var(--y);color:var(--k);font:700 10px Inter,Arial,sans-serif;padding:2px 7px;border-radius:999px;pointer-events:none}
+
+.msg{margin-top:12px;font:600 14px Inter,Arial,sans-serif}
+.msg.ok{color:var(--ok)}.msg.bad{color:var(--red)}
+.it{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.it:last-child{border-bottom:0}
+.th{width:58px;height:58px;border-radius:var(--r2);background:var(--g);object-fit:cover;flex:none;display:grid;place-items:center;font-size:11px;color:#999;text-align:center}
+.info{flex:1;min-width:0}
+.info b{display:block;color:var(--k);font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.info small{display:block;color:var(--txt);font-size:13px}
+.info .out{color:var(--red);font-weight:700}
+.acts{display:flex;flex-direction:column;gap:6px}
+
+.ohead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.ohead h2{margin:0}
+.ord{border:1px solid var(--line);border-radius:var(--r2);margin-bottom:10px;background:var(--w);overflow:hidden}
+.ord.done{opacity:.8}
+.ord summary{list-style:none;padding:12px 14px;cursor:pointer;display:flex;gap:10px;align-items:center}
+.ord summary::-webkit-details-marker{display:none}
+.ord .s1{flex:1;min-width:0}
+.ord .s1 b{display:block;color:var(--k);font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ord .s1 small{display:block;color:var(--txt);font-size:13px}
+.pill{flex:none;padding:3px 10px;border-radius:999px;background:var(--y);color:var(--k);font:700 11px Inter,Arial,sans-serif}
+.ord.done .pill{background:#e8f5ec;color:var(--ok)}
+.ord .body{padding:4px 14px 14px;border-top:1px solid var(--line);font-size:14px}
+.ord .body ul{margin:10px 0;padding-left:18px;color:var(--k)}
+.ord .body p{margin:6px 0;word-break:break-word}
+.ord .body p b{color:var(--k)}
+.ord .body a{color:var(--k);font-weight:600}
+.ord .oacts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+a.bl{display:inline-flex;align-items:center;min-height:38px;padding:0 14px;border-radius:var(--r2);background:var(--y);color:var(--k)!important;font:700 13px Inter,Arial,sans-serif;text-decoration:none}
+
+.login{max-width:420px;margin:40px auto;padding:0 16px}
+.login .logo{display:block;width:96px;height:96px;border-radius:50%;margin:0 auto 18px}
+.login h1{text-align:center;margin-bottom:6px}
+.login .sub{text-align:center;margin-bottom:20px}
+[hidden]{display:none!important}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="login" id="lock">
+<img class="logo" src="logo.png" alt="">
+<h1>Espace administrateur</h1>
+<p class="sub">La Maison Des Pros</p>
+<div class="card">
+<label for="em">Adresse e-mail</label>
+<input id="em" type="email" autocomplete="username" inputmode="email">
+<label for="pw">Mot de passe</label>
+<input id="pw" type="password" autocomplete="current-password">
+<p class="msg bad" id="lerr" hidden></p>
+<div class="row"><button id="login" class="dk">Se connecter</button></div>
+</div>
+</div>
+
+<div id="app" hidden>
+<div class="top"><div class="in">
+<img src="logo.png" alt="">
+<b>Administration</b>
+<button id="out">Déconnexion</button>
+</div></div>
+
+<div class="wrap">
+
+<div class="tabs">
+<button class="tab on" id="tabo" type="button">Commandes <span class="nb" id="nb" hidden>0</span></button>
+<button class="tab" id="taba" type="button">Articles</button>
+</div>
+
+<div id="sec-o">
+<div class="card">
+<div class="ohead"><h2>Commandes (<span id="on">0</span>)</h2><button class="sm lt" id="orefresh" type="button">Actualiser</button></div>
+<div id="olist"></div>
+<p id="oempty" hidden>Aucune commande pour le moment.</p>
+<p class="msg" id="omsg" hidden></p>
+<p class="hint">Les 50 dernières commandes sont affichées. Touchez une commande pour voir le détail.</p>
+</div>
+</div>
+
+<div id="sec-a" hidden>
+<div class="card">
+<h2 id="ftitle">Nouvel article</h2>
+<label for="nom">Nom de l’article</label>
+<input id="nom" placeholder="Ex : Crampons Nike taille 42">
+<label for="cat">Catégorie</label>
+<select id="cat"></select>
+<label for="prix">Prix en FCFA</label>
+<input id="prix" type="number" inputmode="numeric" min="0" step="500" placeholder="Ex : 25000 (vide = prix sur demande)">
+<label for="ancien">Ancien prix en FCFA <span style="font-weight:400">(facultatif, pour une promo)</span></label>
+<input id="ancien" type="number" inputmode="numeric" min="0" step="500" placeholder="Ex : 30000 (doit être plus grand que le prix)">
+<label for="tailles">Tailles ou options <span style="font-weight:400">(facultatif)</span></label>
+<input id="tailles" placeholder="Ex : 39 40 41 42 43 ou XL L M">
+<p class="hint">Séparez par un espace ou une virgule : une taille = un bouton.</p>
+<label for="d">Description courte</label>
+<textarea id="d" rows="2" placeholder="Ex : Terrain sec, pointures 38 à 45"></textarea>
+
+<label class="chk" for="epuise"><input id="epuise" type="checkbox"><span>Article épuisé (le client ne peut plus le commander)</span></label>
+
+<p class="lb">Photos (3 maximum)</p>
+<div class="slots" id="slots"></div>
+<p class="hint" id="cnt">0 / 3 photos. Touchez une case pour choisir une photo.</p>
+<p class="hint">Si rien ne s’ouvre quand vous touchez une case, ouvrez cette page dans Chrome.</p>
+<p class="msg" id="pst" hidden></p>
+
+<div class="row"><button id="save">Ajouter l’article</button><button id="cancel" class="lt" hidden>Annuler</button></div>
+<p class="msg" id="msg" hidden></p>
+</div>
+
+<div class="card">
+<h2>Mes articles (<span id="n">0</span>)</h2>
+<div id="list"></div>
+<p id="empty" hidden>Aucun article pour le moment.</p>
+</div>
+</div>
+
+<p style="text-align:center"><a href="index.html" style="color:var(--k);font-weight:600">Voir le site</a></p>
+</div>
+</div>
+
+<script type="module" src="admin.js"></script>
+</body>
+</html>

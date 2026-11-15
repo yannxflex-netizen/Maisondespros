@@ -1,0 +1,45 @@
+/* ---------- Barre de progression ---------- */
+#prog{position:fixed;top:0;left:0;right:0;height:3px;z-index:40;background:var(--y);transform-origin:0 50%;transform:scaleX(0);pointer-events:none}
+
+/* ---------- Accueil animé ---------- */
+@keyframes heroIn{from{opacity:0;transform:translateY(22px)}}
+@keyframes heroImg{from{opacity:0;transform:scale(.8)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes halo{
+0%,100%{box-shadow:0 0 0 4px var(--y),0 0 0 rgba(255,196,0,0)}
+50%{box-shadow:0 0 0 4px var(--y),0 0 46px rgba(255,196,0,.45)}
+}
+.hero .kicker,.hero h1,.hero .lead,.hero .row{animation:heroIn .7s cubic-bezier(.2,.7,.2,1) backwards}
+.hero .kicker{animation-delay:.05s}
+.hero h1{animation-delay:.15s}
+.hero .lead{animation-delay:.3s}
+.hero .row{animation-delay:.45s}
+.hero-img img,.hero-img .avatar{
+animation:heroImg .9s .2s cubic-bezier(.2,.7,.2,1) backwards,float 6s 1.1s ease-in-out infinite,halo 3.2s 1.1s ease-in-out infinite
+}
+.hero-img .cap{animation:heroIn .7s .6s backwards}
+
+/* ---------- Bandeau défilant ---------- */
+.marq{background:var(--y);color:var(--k);overflow:hidden;white-space:nowrap;border-bottom:1px solid var(--y2)}
+.mt{display:flex;width:max-content;animation:marq 34s linear infinite}
+.mg{display:flex;flex:none;align-items:center}
+.mg span{padding:13px 0;font:800 14px var(--h);text-transform:uppercase;letter-spacing:.14em}
+.mg i{margin:0 22px;font-style:normal;font-size:13px}
+@keyframes marq{to{transform:translateX(-50%)}}
+
+/* ---------- Apparition au défilement ---------- */
+.rv{opacity:0}
+.rv.in{opacity:1;animation:rvIn .65s cubic-bezier(.2,.7,.2,1) var(--d,0ms) backwards}
+@keyframes rvIn{from{opacity:0;transform:translateY(26px)}}
+
+/* ---------- Panier vivant ---------- */
+.fly{position:fixed;left:0;top:0;z-index:80;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:var(--y);box-shadow:0 0 0 3px var(--k),0 6px 16px rgba(0,0,0,.35);pointer-events:none}
+.cartbtn.bump{animation:bump .45s ease}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
+.badge.pop{animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.55)}100%{transform:scale(1)}}
+
+@media(prefers-reduced-motion:reduce){
+.marq{display:none}
+#prog{display:none}
+}
