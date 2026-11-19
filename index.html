@@ -186,8 +186,29 @@
 <label class="lab" for="ctel2">Autre numéro joignable <span class="opt-l">(facultatif)</span></label>
 <input class="fld" id="ctel2" type="tel" inputmode="tel" placeholder="Un deuxième numéro, si possible">
 
-<label class="lab" for="cloc">Votre localisation</label>
-<textarea class="fld" id="cloc" rows="2" placeholder="Ville, quartier, repère (ex : Yopougon, près du marché)"></textarea>
+<label class="lab" for="cville">Ville</label>
+<select class="fld" id="cville">
+<option value="">Choisir une ville</option>
+<option>Abidjan</option>
+<option>Bouaké</option>
+<option>Yamoussoukro</option>
+<option>San-Pédro</option>
+<option>Daloa</option>
+<option>Korhogo</option>
+<option>Man</option>
+<option>Gagnoa</option>
+<option value="autre">Autre</option>
+</select>
+
+<div id="cautre" hidden>
+<label class="lab" for="cpays">Pays</label>
+<input class="fld" id="cpays" type="text" placeholder="Ex : Mali">
+<label class="lab" for="cvautre">Ville</label>
+<input class="fld" id="cvautre" type="text" placeholder="Ex : Bamako">
+</div>
+
+<label class="lab" for="cloc">Quartier / repère</label>
+<textarea class="fld" id="cloc" rows="2" placeholder="Quartier, repère (ex : Yopougon, près du marché)"></textarea>
 <button type="button" class="gps" id="cgps"><svg width="18" height="18"><use href="#i-pin"/></svg><span>Utiliser ma position</span></button>
 <p class="gpsok" id="cgpsok" hidden></p>
 
@@ -209,4 +230,5 @@
 <script src="anim.js" defer></script>
 <script type="module" src="script.js"></script>
 </body>
-</html>
+                     </html>
+  
