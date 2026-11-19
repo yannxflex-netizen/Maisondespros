@@ -425,7 +425,7 @@ try{
 }catch(e){}
 
 /* ---------- Formulaire de livraison (mémorisé pour la prochaine fois) ---------- */
-var FIELDS=["cnom","ctel","ctel2","cloc"];
+var FIELDS=["cnom","ctel","ctel2","cloc","cville","cpays","cvautre"];
 try{
  var saved=JSON.parse(localStorage.getItem(INFOKEY)||"{}");
  FIELDS.forEach(function(id){if(saved[id])$(id).value=saved[id]});
@@ -440,6 +440,31 @@ FIELDS.concat(["cadr2"]).forEach(function(id){
   }catch(e){}
  });
 });
+
+/* ---------- Ville : liste de 8 villes + « Autre » (pays et ville libres) ---------- */
+function applyVille(){
+ $("cautre").hidden=$("cville").value!=="autre";
+}
+$("cville").addEventListener("change",function(){
+ applyVille();
+ $("cville").classList.remove("bad");$("cerr").hidden=true;
+ try{
+  var o={};FIELDS.forEach(function(k){o[k]=$(k).value});
+  localStorage.setItem(INFOKEY,JSON.stringify(o));
+ }catch(e){}
+});
+applyVille();
+
+function villeInfo(){
+ var v=$("cville").value;
+ if(!v)return {ok:false,msg:"Choisissez votre ville.",field:$("cville")};
+ if(v!=="autre")return {ok:true,texte:v};
+ var pays=$("cpays").value.trim(),ville=$("cvautre").value.trim();
+ if(!pays)return {ok:false,msg:"Écrivez votre pays.",field:$("cpays")};
+ if(!ville)return {ok:false,msg:"Écrivez votre ville.",field:$("cvautre")};
+ return {ok:true,texte:ville+" ("+pays+")"};
+}
+
 applyMode();
 
 function telOK(v){return v.replace(/\D/g,"").length>=8&&/^[0-9+\s().-]+$/.test(v)}
@@ -470,134 +495,95 @@ function saveOrder(o){
  }catch(e){console.warn(e)}
 }
 
-/* ---------- Écran de confirmation ---------- */
-var cf=document.createElement("div");
-cf.id="confirm";cf.hidden=true;
-cf.setAttribute("role","dialog");cf.setAttribute("aria-modal","true");cf.setAttribute("aria-labelledby","cft");
-cf.innerHTML='<div class="cfbox" tabindex="-1">'+
- '<div class="cfstep" id="cf1">'+
-  '<div class="cfic"><svg width="30" height="30"><use href="#i-check"/></svg></div>'+
-  '<h2 id="cft">Votre commande est prête</h2>'+
-  '<p class="cfs">Vérifiez le récapitulatif, puis envoyez-le sur WhatsApp pour finaliser.</p>'+
-  '<ul class="cfl" id="cfl"></ul>'+
-  '<div class="cftot"><span>Total</span><b id="cftot"></b></div>'+
-  '<p class="cfm" id="cfm"></p>'+
-  '<a class="btn wag full" id="cfgo" target="_blank" rel="noopener"><svg width="20" height="20"><use href="#i-wa"/></svg><span>Envoyer sur WhatsApp</span></a>'+
-  '<button class="lnk" type="button" id="cfback">Modifier ma commande</button>'+
- '</div>'+
- '<div class="cfstep" id="cf2" hidden>'+
-  '<div class="cfic"><svg width="30" height="30"><use href="#i-check"/></svg></div>'+
-  '<h2>Merci !</h2>'+
-  '<p class="cfs">Terminez l’envoi dans WhatsApp. Nous confirmons votre commande dès réception.</p>'+
-  '<button class="btn yel full" type="button" id="cfclose">Fermer</button>'+
- '</div>'+
-'</div>';
-document.body.appendChild(cf);
-
-var pending=null,cfDone=false;
-function openConfirm(url,order,t,mode,loc,tel){
- pending=order;cfDone=false;
- $("cf1").hidden=false;$("cf2").hidden=true;
- var ul=$("cfl");ul.innerHTML="";
- cart.forEach(function(x){
-  var li=document.createElement("li");
-  var a=document.createElement("span"),b=document.createElement("span");
-  a.textContent=x.qty+" × "+x.nom+(x.taille?" ("+x.taille+")":"");
-  b.textContent=hasPrice(x)?fcfa(Number(x.prix)*x.qty):"Sur demande";
-  li.appendChild(a);li.appendChild(b);ul.appendChild(li);
- });
- $("cftot").textContent=fcfa(t.total)+(t.devis?" +":"");
- $("cfm").textContent=mode==="livraison"
-  ?"Livraison : "+(loc||"position GPS")+" · Contact : "+tel
-  :"Retrait au magasin, paiement sur place.";
- $("cfgo").href=url;
- cf.hidden=false;
- cf.querySelector(".cfbox").focus();
+/* ---------- Ouverture / fermeture du panier ---------- */
+function openCart(){
+ $("ov").hidden=false;$("drawer").hidden=false;
+ document.body.style.overflow="hidden";
 }
-function closeConfirm(){
- cf.hidden=true;
- if(cfDone){cfDone=false;closeCart()}
+function closeCart(){
+ $("ov").hidden=true;$("drawer").hidden=true;
+ document.body.style.overflow="";
 }
-$("cfgo").addEventListener("click",function(){
- if(pending){saveOrder(pending);pending=null}
- cart=[];saveCart();drawCart();
- cfDone=true;
- $("cf1").hidden=true;$("cf2").hidden=false;
-});
-$("cfback").onclick=closeConfirm;
-$("cfclose").onclick=closeConfirm;
-cf.addEventListener("click",function(e){if(e.target===cf)closeConfirm()});
-
-/* ---------- Envoi de la commande ---------- */
-$("corder").onclick=function(){
- var mode=getMode();
- if(!mode){showErr("Choisissez : livraison ou retrait au magasin.");return}
-
- var nom=$("cnom").value.trim(),tel=$("ctel").value.trim(),tel2=$("ctel2").value.trim();
- var loc=$("cloc").value.trim(),adr2=$("cadr2").value.trim();
-
- if(mode==="livraison"){
-  if(!nom){showErr("Indiquez le nom de la personne qui reçoit la commande.",$("cnom"));return}
-  if(!tel){showErr("Indiquez un numéro joignable.",$("ctel"));return}
-  if(!telOK(tel)){showErr("Le numéro joignable n’est pas valide (8 chiffres minimum).",$("ctel"));return}
-  if(tel2&&!telOK(tel2)){showErr("L’autre numéro n’est pas valide. Corrigez-le ou laissez le champ vide.",$("ctel2"));return}
-  if(!loc&&!gpsLink){showErr("Indiquez votre localisation pour la livraison.",$("cloc"));return}
- }
-
- var t=totals();
- var msg="Bonjour, je souhaite commander :\n";
- cart.forEach(function(x){
-  var label=x.nom+(x.taille?" (taille "+x.taille+")":"");
-  msg+="- "+label+" : "+(hasPrice(x)?x.qty+" × "+fcfa(x.prix)+" = "+fcfa(Number(x.prix)*x.qty):x.qty+" (prix à confirmer)")+"\n";
- });
- msg+="\nTotal : "+fcfa(t.total)+(t.devis?" + articles sur demande":"");
-
- if(mode==="livraison"){
-  msg+="\n\nMode : Livraison";
-  msg+="\nNom : "+nom;
-  msg+="\nNuméro joignable : "+tel;
-  if(tel2)msg+="\nAutre numéro : "+tel2;
-  msg+="\nLocalisation : "+(loc||"voir position GPS");
-  if(gpsLink)msg+="\nPosition GPS : "+gpsLink;
-  if(adr2)msg+="\nAutre adresse de livraison : "+adr2;
- }else{
-  msg+="\n\nMode : Retrait au magasin (paiement sur place)";
- }
-
- var liv=mode==="livraison";
- var order={
-  mode:mode,
-  nom:liv?nom.slice(0,120):"",
-  tel:liv?tel.slice(0,40):"",
-  tel2:liv?tel2.slice(0,40):"",
-  loc:liv?loc.slice(0,400):"",
-  gps:liv?gpsLink:"",
-  adr2:liv?adr2.slice(0,400):"",
-  items:cart.map(function(x){return {nom:String(x.nom).slice(0,120),taille:x.taille||"",qty:x.qty,prix:hasPrice(x)?Number(x.prix):""}}),
-  total:t.total,
-  devis:t.devis
- };
-
- openConfirm("https://wa.me/"+NUM+"?text="+encodeURIComponent(msg),order,t,mode,loc,tel);
-};
-
-function openCart(){$("ov").hidden=false;$("drawer").hidden=false;document.body.style.overflow="hidden"}
-function closeCart(){$("ov").hidden=true;$("drawer").hidden=true;document.body.style.overflow=""}
 $("copen").onclick=openCart;
 $("cclose").onclick=closeCart;
 $("ov").onclick=closeCart;
-$("cclear").onclick=function(){cart=[];saveCart();drawCart()};
-document.addEventListener("keydown",function(e){
- if(e.key==="Escape"){
-  if(!cf.hidden)closeConfirm();
-  else if(!vw.hidden)closeViewer();
-  else if(!mnav.hidden)closeMenu();
-  else closeCart();
- }
- if(!vw.hidden&&vpics>1){
-  if(e.key==="ArrowRight")vGo(1);
-  if(e.key==="ArrowLeft")vGo(-1);
- }
-});
 
-drawCats();drawCatalogue();drawCart();
+/* ---------- Écran de confirmation ---------- */
+function showConfirm(){
+ var c=document.createElement("div");
+ c.setAttribute("role","dialog");c.setAttribute("aria-modal","true");
+ c.style.cssText="position:fixed;inset:0;z-index:70;display:grid;place-items:center;padding:20px;background:rgba(0,0,0,.6)";
+ c.innerHTML='<div style="background:#fff;border-radius:18px;padding:26px 22px;max-width:360px;width:100%;text-align:center;font-family:Inter,Arial,sans-serif">'+
+  '<h2 style="margin:0 0 8px;font:800 22px Montserrat,Arial,sans-serif;color:#101010">Commande prête</h2>'+
+  '<p style="margin:0 0 18px;color:#555">WhatsApp s’est ouvert avec votre commande. Appuyez sur « Envoyer » pour la valider.</p>'+
+  '<button type="button" class="btn yel full" id="cfok">Fermer</button>'+
+  '<button type="button" class="lnk" id="cfclear">Vider le panier</button></div>';
+ document.body.appendChild(c);
+ c.querySelector("#cfok").onclick=function(){c.remove()};
+ c.querySelector("#cfclear").onclick=function(){cart=[];saveCart();drawCart();c.remove()};
+}
+
+/* ---------- Commander sur WhatsApp ---------- */
+$("corder").onclick=function(){
+ if(!cart.length)return;
+ var mode=getMode();
+ if(!mode){showErr("Choisissez livraison ou retrait au magasin.");return}
+
+ var nom="",tel="",tel2="",ville="",loc="",adr2="";
+ if(mode==="livraison"){
+  nom=$("cnom").value.trim();tel=$("ctel").value.trim();tel2=$("ctel2").value.trim();
+  loc=$("cloc").value.trim();adr2=$("cadr2").value.trim();
+  if(!nom){showErr("Écrivez le nom de la personne qui reçoit.",$("cnom"));return}
+  if(!telOK(tel)){showErr("Écrivez un numéro de téléphone valide.",$("ctel"));return}
+  if(tel2&&!telOK(tel2)){showErr("Le deuxième numéro n’est pas valide.",$("ctel2"));return}
+  var vi=villeInfo();
+  if(!vi.ok){showErr(vi.msg,vi.field);return}
+  ville=vi.texte;
+  if(!loc&&!gpsLink){showErr("Écrivez votre quartier ou utilisez votre position.",$("cloc"));return}
+ }
+ showErr("");
+
+ var t=totals();
+ var lines=["Bonjour, je souhaite commander :",""];
+ cart.forEach(function(x){
+  var s="• "+x.nom+(x.taille?" (taille "+x.taille+")":"")+" × "+x.qty;
+  s+=hasPrice(x)?" : "+fcfa(Number(x.prix)*x.qty):" : prix sur demande";
+  lines.push(s);
+ });
+ lines.push("");
+ lines.push("Total : "+fcfa(t.total)+(t.devis?" + articles sur demande":""));
+ lines.push("");
+ if(mode==="livraison"){
+  lines.push("*Mode : Livraison*");
+  lines.push("Nom : "+nom);
+  lines.push("Téléphone : "+tel);
+  if(tel2)lines.push("Autre numéro : "+tel2);
+  lines.push("Ville : "+ville);
+  if(loc)lines.push("Quartier / repère : "+loc);
+  if(adr2)lines.push("Autre adresse de livraison : "+adr2);
+  if(gpsLink)lines.push("Position GPS : "+gpsLink);
+ }else{
+  lines.push("*Mode : Retrait au magasin*");
+ }
+
+ saveOrder({
+  mode:mode,nom:nom,tel:tel,tel2:tel2,ville:ville,localisation:loc,autreAdresse:adr2,gps:gpsLink,
+  articles:cart.map(function(x){return {nom:x.nom,taille:x.taille||"",qty:x.qty,prix:hasPrice(x)?x.prix:""}}),
+  total:t.total,devis:t.devis
+ });
+
+ var url="https://wa.me/"+NUM+"?text="+encodeURIComponent(lines.join("\n"));
+ var w=window.open(url,"_blank");
+ if(!w)location.href=url;
+ closeCart();
+ showConfirm();
+};
+
+$("cclear").onclick=function(){
+ if(confirm("Vider le panier ?")){cart=[];saveCart();drawCart()}
+};
+
+/* ---------- Démarrage ---------- */
+drawCats();
+drawCatalogue();
+drawCart();
